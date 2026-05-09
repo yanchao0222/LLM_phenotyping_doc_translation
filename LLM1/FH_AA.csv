@@ -1,0 +1,4 @@
+Setting,Logical & Boolean accuracy,Temporal constraint implementation,Value-Set precision,OMOP schema,Coding efficiency,Human readability,Revision effort
+ALL,4,4,3,2,3,3,1
+TEXT,4,4,3,2,3,3,1
+DIAG,1,1,1,2,3,2,0
