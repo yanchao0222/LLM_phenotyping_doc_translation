@@ -1,0 +1,643 @@
+# Prompt 1 — Extract the Source-Grounded Phenotype Specification
+
+
+
+
+
+
+You are an expert in clinical phenotyping, epidemiology, and the OMOP Common Data Model.
+
+Your task is to extract the complete phenotyping algorithm for identifying **cases and controls for Type 2 Diabetes Mellitus** from the attached PDF file or files.
+
+The PDF is the sole source of truth. Do not use outside clinical knowledge to add, modify, or complete the phenotype definition.
+
+## Objectives
+
+1. Identify every criterion that is part of the case or control definition.
+2. Determine exactly how the criteria are logically and temporally combined.
+3. Distinguish the final phenotype algorithm from background information, exploratory analyses, validation methods, and descriptive statistics.
+4. Produce a source-grounded, implementation-ready phenotype specification.
+5. Preserve all code lists, thresholds, counts, exclusions, and time windows without abbreviation or truncation.
+
+## Extraction Requirements
+
+Review all relevant content, including:
+
+* Main text
+* Methods
+* Tables
+* Figures
+* Flow diagrams
+* Footnotes
+* Appendices
+* Supplementary definitions contained in the provided files
+
+Extract, when present:
+
+* Inclusion criteria
+* Exclusion criteria
+* Case criteria
+* Control criteria
+* Index-date definition
+* Required event counts
+* Whether qualifying events must occur on distinct dates
+* Minimum or maximum time between events
+* Lookback and follow-up periods
+* Age, sex, race, or other demographic restrictions
+* Observation or enrollment requirements
+* Diagnosis codes
+* Procedure codes
+* Drug or ingredient codes
+* Laboratory-test codes and value thresholds
+* Symptom or clinical finding codes
+* Encounter or care-setting restrictions
+* Provider-specialty restrictions
+* Disease-free or washout periods
+* Rules for resolving multiple possible index dates
+* Any hierarchy, descendant, or code-range logic
+* Any criteria applied only to cases or only to controls
+* Any rule preventing a person from qualifying as both a case and a control
+
+Do not infer a criterion merely because it is clinically reasonable.
+
+## Concept and Code Rules
+
+1. Use OMOP domains and concepts to categorize diagnoses, procedures, measurements, observations, medications, visits, devices, and other clinical events.
+2. Do not invent OMOP `concept_id` values.
+3. Preserve every code exactly as written in the PDF.
+4. Record the source vocabulary when it is explicitly provided, such as ICD-9-CM, ICD-10-CM, CPT, HCPCS, LOINC, RxNorm, or NDC.
+5. Do not guess the vocabulary when it is not stated or cannot be determined from the PDF.
+6. When both a concept name and a code are provided, use the code in machine-readable logic. The name may appear only in explanatory comments or the evidence table.
+7. Do not replace explicit code lists with concept names.
+8. Do not abbreviate code lists with phrases such as “and others,” “etc.,” or ellipses.
+9. Do not expand code ranges, include descendants, or add related concepts unless the source explicitly requires that behavior.
+10. Clearly distinguish literal source codes from any later OMOP standard-concept mapping.
+
+## Required Output
+
+### A. Phenotype Overview
+
+Provide:
+
+* Phenotype name
+* Study population, when defined
+* Unit of classification, such as person, encounter, or episode
+* Case definition summary
+* Control definition summary
+* Index-date summary
+* Relevant source sections, tables, figures, and pages
+
+### B. Source Evidence Matrix
+
+Create one row for each atomic criterion with these fields:
+
+* Criterion ID
+* Case, control, or shared criterion
+* Criterion type
+* OMOP domain
+* Source vocabulary
+* Exact code or complete code list
+* Required count
+* Distinct-date requirement
+* Value or threshold
+* Temporal relationship
+* Inclusion or exclusion
+* Source page
+* Source section, table, figure, or appendix
+* Grounding notes
+
+Use concise paraphrases rather than unsupported interpretation.
+
+### C. Logical Phenotype Specification
+
+Express the algorithm in SQL-style Boolean logic, but do not yet produce the final executable database query.
+
+Use explicit structures such as:
+
+```sql
+CASE_DEFINITION :=
+    POPULATION_REQUIREMENTS
+    AND CASE_INCLUSION_CRITERIA
+    AND NOT CASE_EXCLUSION_CRITERIA;
+
+CONTROL_DEFINITION :=
+    POPULATION_REQUIREMENTS
+    AND CONTROL_INCLUSION_CRITERIA
+    AND NOT CONTROL_EXCLUSION_CRITERIA
+    AND NOT CASE_DEFINITION;
+```
+
+Replace the example structure with the actual source-grounded logic.
+
+Explicitly represent:
+
+* `AND`
+* `OR`
+* `NOT`
+* Counts
+* Distinct dates
+* Date windows
+* Before-or-after relationships
+* Index-date selection
+* Exclusions
+* Case-control precedence
+
+Do not simplify logic when doing so could change the phenotype.
+
+### D. Ambiguities and Missing Information
+
+List every implementation-relevant detail that the PDF does not define clearly.
+
+For each ambiguity, state:
+
+* What is unclear
+* Where the ambiguity appears
+* Why it matters for implementation
+* Whether an executable implementation can proceed without inventing information
+
+Do not resolve ambiguities using outside knowledge.
+
+## Quality-Control Checklist
+
+Before responding, verify that:
+
+* Every criterion is supported by the PDF.
+* Every code is copied accurately.
+* No code has been omitted.
+* No external clinical criterion has been added.
+* Case and control logic are separated clearly.
+* All counts and time windows are explicit.
+* All logical operators are explicit.
+* Every criterion has a page-level citation.
+* No ellipses or incomplete code lists are present.
+* The output is sufficiently precise to support SQL implementation.
+
+
+
+
+
+
+
+# Prompt 2 — Audit and Correct the Extracted Phenotype
+
+
+
+
+
+Independently audit the phenotype specification produced above against the attached PDF file or files.
+
+Treat the PDF as the sole source of truth. Treat the preceding phenotype specification as an unverified draft.
+
+Your task is to identify and correct every unsupported, omitted, mistranscribed, ambiguous, or logically incorrect detail.
+
+## Audit Procedure
+
+For every criterion in the preceding specification:
+
+1. Locate its supporting evidence in the PDF.
+2. Confirm the exact code or complete code list.
+3. Confirm the source vocabulary, when stated.
+4. Confirm whether it applies to cases, controls, or both.
+5. Confirm whether it is an inclusion or exclusion.
+6. Confirm the required number of events.
+7. Confirm whether events must occur on distinct dates.
+8. Confirm all temporal windows and sequence requirements.
+9. Confirm all demographic, observation, encounter, provider, and care-setting restrictions.
+10. Confirm the index-date rule.
+11. Confirm how criteria are joined with `AND`, `OR`, and `NOT`.
+12. Confirm whether a person can qualify for both groups and, if not, how overlap is prevented.
+
+Also identify criteria present in the PDF but missing from the preceding specification.
+
+## Correction Rules
+
+* Remove all unsupported criteria.
+* Add all omitted criteria.
+* Correct all mistranscribed codes, thresholds, counts, dates, and operators.
+* Do not introduce external disease knowledge.
+* Do not invent OMOP `concept_id` values.
+* Do not guess an unspecified code vocabulary.
+* Preserve complete code lists without abbreviation.
+* Use codes rather than names in machine-readable logic when both are available.
+* Names may appear in comments or evidence descriptions.
+* Do not infer descendant inclusion, wildcard matching, code-prefix matching, or code-range expansion unless the PDF explicitly supports it.
+* Do not interpret validation statistics, predictive values, sensitivity analyses, or cohort characteristics as phenotype criteria unless the PDF explicitly includes them in the operational definition.
+* Do not silently resolve ambiguous language. Record the ambiguity.
+
+## Required Output
+
+### A. Audit Findings
+
+Provide a compact correction log containing:
+
+* Original criterion or statement
+* Audit result: verified, corrected, removed, or added
+* Reason
+* Supporting page and source location
+* Corrected interpretation
+
+### B. Verified Evidence Matrix
+
+Produce a corrected evidence matrix using the same fields as Prompt 1.
+
+Every retained criterion must have a page-level citation.
+
+### C. Verified Phenotype Specification
+
+Produce a complete replacement for the earlier logical specification.
+
+Use explicit SQL-style Boolean logic with:
+
+* Clearly named criteria
+* Explicit `AND`, `OR`, and `NOT`
+* Complete code lists
+* Explicit counts
+* Explicit distinct-date requirements
+* Explicit temporal relationships
+* Explicit index-date logic
+* Separate case and control definitions
+* Explicit handling of case-control overlap
+
+This replacement specification will be the sole algorithm used in the next stage.
+
+### D. Remaining Implementation Limitations
+
+List only unresolved details that materially affect SQL implementation.
+
+For each limitation, specify whether it:
+
+* Prevents implementation
+* Permits a partial but grounded implementation
+* Can be implemented literally without additional interpretation
+
+Do not ask the user questions. Do not fill missing information with assumptions.
+
+## Final Verification
+
+Before responding, confirm that:
+
+* Every retained detail is supported by the PDF.
+* All code lists are complete.
+* All source locations are recorded.
+* No criterion comes from outside knowledge.
+* No unsupported OMOP mappings have been introduced.
+* The verified phenotype specification is internally consistent.
+* No ellipses, placeholders, or abbreviated code lists remain.
+
+
+
+
+
+
+
+# Prompt 3 — Generate Read-Only Executable OMOP SQL
+
+
+
+
+
+Using only the **Verified Phenotype Specification** produced in the preceding step, generate executable SQL that identifies cases and controls in an EHR database conforming to the OMOP Common Data Model.
+
+Do not reinterpret the original PDF at this stage unless needed to resolve a direct transcription inconsistency. Do not add clinical criteria that are absent from the verified specification.
+
+## SQL Environment
+
+Use the following settings when provided:
+
+* Target SQL dialect: `[SQL_DIALECT]`
+* OMOP CDM version: `[OMOP_CDM_VERSION]`
+* OMOP CDM schema: `[CDM_SCHEMA]`
+* Vocabulary schema, when separate: `[VOCABULARY_SCHEMA]`
+
+When a setting is not supplied:
+
+* Use PostgreSQL-compatible ANSI SQL.
+* Use only core tables and columns commonly available in OMOP CDM v5.x.
+* Use unqualified table names rather than inventing a schema name.
+* Clearly identify any dialect-specific function in a SQL comment.
+
+## Read-Only Requirement
+
+The output must consist only of read-only queries.
+
+Do not use:
+
+* `CREATE TABLE`
+* `CREATE TEMP TABLE`
+* `CREATE VIEW`
+* `INSERT`
+* `UPDATE`
+* `DELETE`
+* `MERGE`
+* `DROP`
+* `ALTER`
+* Stored procedures
+* User-defined functions
+
+Common table expressions introduced with `WITH` are permitted.
+
+## OMOP Implementation Requirements
+
+Use the appropriate OMOP tables, including only those required by the verified algorithm, such as:
+
+* `person`
+* `observation_period`
+* `condition_occurrence`
+* `procedure_occurrence`
+* `drug_exposure`
+* `measurement`
+* `observation`
+* `visit_occurrence`
+* `device_exposure`
+* `death`
+* `concept`
+* `concept_relationship`
+* `concept_ancestor`
+
+Use valid OMOP column names for the specified CDM version.
+
+### Concept Resolution
+
+Do not invent OMOP `concept_id` values.
+
+When the PDF provides source vocabulary codes:
+
+1. Resolve the source concepts through the `concept` table using the exact `vocabulary_id` and `concept_code`.
+2. When necessary, map non-standard source concepts to standard concepts using valid `"Maps to"` relationships in `concept_relationship`.
+3. Include the original concept when it is already standard.
+4. Include descendants through `concept_ancestor` only when descendant inclusion is explicitly required by the verified algorithm.
+5. Do not use concept-name matching when an exact code is available.
+6. Do not use `LIKE`, prefix matching, or inferred code ranges unless explicitly required.
+7. Preserve the complete code list in the concept-set CTE.
+8. Detect vocabulary codes that fail to resolve rather than silently dropping them.
+
+When a vocabulary is not identified in the verified specification, do not guess it. Implement only the portion that can be grounded safely and document the limitation in SQL comments.
+
+### Event and Temporal Logic
+
+Implement exactly:
+
+* Required event counts
+* Distinct-date requirements
+* Lookback periods
+* Follow-up periods
+* Washout periods
+* Minimum and maximum gaps
+* Before-or-after relationships
+* Same-day requirements
+* Age calculations
+* Observation-period requirements
+* Encounter or care-setting restrictions
+* Provider restrictions
+* Laboratory values, units, and abnormality criteria
+* Index-date selection
+* Exclusion windows
+* Case-control precedence
+
+Do not add observation-period, age, visit, or data-quality restrictions unless they appear in the verified algorithm.
+
+Use deterministic logic when multiple qualifying index dates exist. Apply the exact source rule; when the source specifies “first,” use the earliest qualifying date.
+
+### Query Structure
+
+Organize the SQL into clearly labeled sections such as:
+
+1. Configuration and assumptions
+2. Source-code concept sets
+3. Standard-concept mapping
+4. Base eligible population
+5. Case criterion events
+6. Case aggregation and temporal logic
+7. Case exclusions
+8. Final cases
+9. Control eligibility
+10. Control exclusions
+11. Final controls
+12. Combined phenotype output
+13. Vocabulary-resolution quality checks
+
+Use descriptive SQL comments throughout.
+
+Avoid:
+
+* `SELECT *`
+* Unqualified ambiguous column names
+* Accidental many-to-many joins
+* Person duplication
+* Unsupported functions
+* Implicit date conversions
+* Applying filters after a `LEFT JOIN` in a way that unintentionally converts it into an `INNER JOIN`
+* `NOT IN` when nullable values could produce incorrect results
+
+Prefer `EXISTS` and `NOT EXISTS` for inclusion and exclusion logic when appropriate.
+
+## Required Result
+
+Return one person-level result set with these columns:
+
+```text
+person_id
+phenotype_group
+index_date
+```
+
+Use:
+
+* `phenotype_group = 'CASE'` for cases
+* `phenotype_group = 'CONTROL'` for controls
+
+A person must not appear in both groups unless the verified algorithm explicitly permits overlap.
+
+Return at most one row per person per phenotype group unless the phenotype is explicitly episode-based.
+
+When useful for validation, additional evidence columns may be included after the required columns, such as qualifying-event counts or criterion flags. Do not omit the three required columns.
+
+## Missing or Ambiguous Criteria
+
+When an essential detail remains unspecified:
+
+* Do not invent a value.
+* Generate the maximal executable query supported by the verified algorithm.
+* Mark the limitation in a clearly labeled SQL comment.
+* Do not include incomplete predicates or unresolved pseudocode.
+* Do not use ellipses.
+* Do not ask the user questions.
+
+When the PDF does not define controls, do not create a generic “non-case” control group unless the verified specification explicitly authorizes that definition. Produce the grounded case query and state the control limitation in SQL comments.
+
+## Output Format
+
+Provide:
+
+1. A brief implementation summary.
+2. One complete SQL code block containing the read-only executable query.
+3. A brief list of grounded implementation limitations, if any.
+
+Do not provide alternative SQL versions unless required for dialect compatibility.
+
+
+
+
+
+
+
+# Prompt 4 — Validate and Produce the Final SQL
+
+
+
+
+
+Perform an independent final audit of the SQL generated above.
+
+Use the following authority order:
+
+1. The attached PDF file or files
+2. The Verified Phenotype Specification
+3. The generated SQL
+
+The PDF and verified specification take precedence over the generated SQL.
+
+Your task is to correct every grounding, logic, OMOP, and SQL-execution error and then return the final read-only query without asking further questions.
+
+## Grounding Audit
+
+Verify that every SQL predicate is supported by the verified phenotype specification and ultimately by the PDF.
+
+Check for:
+
+* Unsupported inclusion criteria
+* Unsupported exclusions
+* Missing criteria
+* Incomplete code lists
+* Incorrect codes
+* Incorrect vocabularies
+* Incorrect thresholds
+* Incorrect event counts
+* Incorrect distinct-date logic
+* Incorrect temporal windows
+* Incorrect index-date logic
+* Incorrect case-control overlap handling
+* Unsupported descendant expansion
+* Unsupported wildcard or prefix matching
+* Unsupported assumptions about observation periods or encounters
+
+Remove or correct every unsupported predicate.
+
+## OMOP Audit
+
+Verify:
+
+* Correct OMOP tables
+* Correct OMOP column names
+* Correct domain placement
+* Correct standard-versus-source concept handling
+* Correct use of `concept`
+* Correct use of `"Maps to"` relationships
+* Correct use of `concept_ancestor`
+* Correct handling of invalid concepts
+* Correct handling of mapped and already-standard concepts
+* Correct measurement values and units
+* Correct drug, procedure, visit, condition, and observation logic
+* Compatibility with the specified OMOP CDM version
+
+Do not invent concept IDs or schema names.
+
+## SQL Audit
+
+Validate the query for the specified SQL dialect.
+
+Check:
+
+* CTE dependency order
+* Alias scope
+* Column existence
+* Data-type compatibility
+* Date arithmetic
+* Aggregation and `GROUP BY` correctness
+* Window-function correctness
+* Correlated-subquery correctness
+* Boolean-expression precedence
+* Null behavior
+* Duplicate generation
+* Many-to-many joins
+* `UNION` compatibility
+* Case-control mutual exclusivity
+* Stable index-date selection
+* Semicolon placement
+* Reserved words
+* Dialect-specific functions
+
+Use explicit parentheses when Boolean precedence could be misunderstood.
+
+Use `EXISTS` or `NOT EXISTS` instead of nullable `NOT IN` expressions.
+
+Ensure that every CTE is referenced or remove it.
+
+## Concept-Set Audit
+
+For every concept set:
+
+1. Confirm that every source code from the verified specification is present.
+2. Confirm that no unsupported source code has been added.
+3. Confirm the correct `vocabulary_id`.
+4. Confirm that exact code matching is used.
+5. Confirm that code resolution does not silently discard unresolved codes.
+6. Confirm that mapping to standard concepts is valid.
+7. Confirm that descendants are included only when explicitly required.
+8. Confirm that the clinical-event query uses the appropriate standard concept identifier.
+9. Confirm that duplicate mapped concepts do not multiply clinical events.
+
+Include a read-only vocabulary-resolution check when unresolved source codes could otherwise go unnoticed.
+
+## Case and Control Audit
+
+Confirm that:
+
+* Every case satisfies all required case criteria.
+* Every case exclusion is applied.
+* Every control satisfies all required control criteria.
+* Every control exclusion is applied.
+* Controls are not merely defined as non-cases unless the source explicitly says so.
+* A person cannot appear as both a case and a control unless explicitly allowed.
+* The index date for each group follows the verified rule.
+* The final result contains no unintended duplicate people.
+
+## Final Output Requirements
+
+Return:
+
+### A. Validation Summary
+
+Briefly state:
+
+* Whether material errors were found
+* The categories of corrections made
+* Any source ambiguity that still limits implementation
+
+Do not provide a lengthy chain-of-thought explanation.
+
+### B. Final SQL
+
+Provide one complete SQL code block containing the corrected read-only query.
+
+The final query must:
+
+* Be executable in the specified SQL dialect
+* Use valid OMOP CDM tables and columns
+* Contain no DDL or data-modification statements
+* Contain no ellipses
+* Contain no pseudocode
+* Contain no unresolved `TODO` markers
+* Contain no invented clinical criteria
+* Contain no invented concept IDs
+* Contain complete code lists
+* Use descriptive section headers and comments
+* Include PDF page references in comments for major phenotype criteria
+* Return `person_id`, `phenotype_group`, and `index_date`
+* Return no more than one row per person per group unless the phenotype is explicitly episode-based
+
+### C. Remaining Limitations
+
+After the SQL, list only limitations that cannot be resolved from the provided files.
+
+Do not ask follow-up questions. Do not produce multiple competing queries. Produce the strongest fully grounded and executable result supported by the available evidence.

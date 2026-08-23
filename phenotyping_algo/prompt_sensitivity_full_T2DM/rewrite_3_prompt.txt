@@ -1,0 +1,65 @@
+You are an expert in clinical phenotyping. Below are four prompts that are executed one after another within a single conversation with a large language model. Your task is to refine them so they better accomplish their shared goal: deriving executable phenotyping algorithms expressed as SQL queries from given PDF files.
+
+"""
+##### Prompt 1
+
+
+
+
+You are an expert in disease phenotyping. Your task is to extract the phenotyping algorithm for identifying cases and controls for Autoimmune Disease from the attached PDF file. 
+
+Let's think step by step: 
+1. List all the considered criteria. 
+2. Extract how these criteria are combined. 
+3. Derive the algorithm. 
+4. Ensure optimal readability by using informative comments and organized headers.
+
+Instructions to follow: 
+1. Use “AND”, “OR”, “NOT” and other necessary logical operators to organize the algorithm clearly and precisely. 
+2. Use Observational Medical Outcomes Partnership (OMOP) concepts for diagnoses, symptoms, procedures, laboratory tests, medications, etc. 
+3. When both names and codes for considered concepts are provided, only use codes and do not use names. 
+4. Use SQL style to organize the final algorithm. 
+5. Do not use ellipsis in the algorithm. 
+6. Make sure descriptive comments and headers are added to enhance human readability. 
+
+
+
+
+
+##### Prompt 2
+
+
+
+
+Verify that the produced algorithms and all their details are grounded in the provided file. If not, correct errors and generate a new version. Again, follow the instructions below: 
+
+Instructions to follow: 
+1. Use “AND”, “OR”, “NOT” and other necessary logical operators to organize the algorithm clearly and precisely. 
+2. Use Observational Medical Outcomes Partnership (OMOP) concepts for diagnoses, symptoms, procedures, laboratory tests, medications, etc. 
+3. When both names and codes for considered concepts are provided, only use codes and do not use names. 
+4. Use SQL style to organize the final algorithm. 
+5. Do not use ellipsis in the algorithm. 
+6. Make sure descriptive comments and headers are added to enhance human readability.
+
+
+
+
+
+##### Prompt 3
+
+
+
+
+Now you need to generate the executable SQL query of the algorithms above so that cases and controls of the phenotype can be accurately found from an EHR database that follows the OMOP Common Data Model. Do not generate tables. Make sure descriptive comments and headers are added to enhance human readability.
+
+
+
+
+
+##### Prompt 4
+
+
+
+
+Verify that the generated SQL queries and all their details are grounded in the algorithms extracted above. Make sure these SQL queries are executable in EHR databases that follow the OMOP Common Data Model. If not, correct all errors and generate the final queries without asking further questions. Do not generate tables. Make sure descriptive comments and headers are added to enhance human readability.
+"""
